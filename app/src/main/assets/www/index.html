@@ -827,6 +827,30 @@ body.noscroll{overflow:hidden}
 [data-skin="vidro"] .aiconf,[data-skin="vidro"] .aiprov{border-color:rgba(148,163,184,.18);border-radius:12px}
 [data-skin="vidro"] .aiprov input,[data-skin="vidro"] #fd-q{border-radius:10px;background:rgba(15,23,42,.8);border-color:rgba(148,163,184,.2)}
 [data-skin="forja"] .aiconf,[data-skin="forja"] .aiprov{border-radius:12px}
+/* ---- Tablaturas e biblioteca pessoal ---- */
+.tbfile{display:inline-flex;align-items:center;cursor:pointer;text-decoration:none}
+.tbhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px 16px;flex-wrap:wrap}
+.tbhead > div{min-width:0;flex:1 1 240px}
+.tbtxt{border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.tbtxt summary{cursor:pointer;font-weight:600;font-size:14px;padding:4px 0}
+.tbtxt[open]{display:grid;gap:10px}
+#tb-txt{width:100%;min-height:150px;font-family:var(--f-mono);font-size:13px;line-height:1.35;padding:10px 12px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);resize:vertical;white-space:pre;overflow-x:auto}
+#tb-tname{height:38px;padding:0 10px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);font-size:15px}
+.tbpaper{background:#fff;color:#111;border-radius:10px;padding:8px 4px;overflow-x:auto;min-height:120px;box-shadow:0 1px 0 rgba(0,0,0,.04),0 6px 20px rgba(0,0,0,.08)}
+#tb-at{min-width:0}
+.at-cursor-bar{background:rgba(43,63,190,.10)}
+.at-selection div{background:rgba(43,63,190,.18)}
+.at-cursor-beat{background:#2B3FBE;width:3px}
+.at-highlight *{fill:#2B3FBE;stroke:#2B3FBE}
+.lib li.libmine{display:flex;gap:4px;align-items:stretch}
+.lib li.libmine > button:first-child{flex:1;min-width:0}
+.lib .libdel{width:auto;min-width:40px;flex:none;display:grid;place-items:center;font-size:18px;color:var(--muted);padding:0 8px}
+.lib .libdel.warn{color:var(--pulse);border-color:var(--pulse);font-size:13px;font-weight:600}
+.lib .libempty{grid-column:1 / -1}
+[data-skin="vidro"] .tbtxt{border-color:rgba(148,163,184,.18);border-radius:12px}
+[data-skin="vidro"] .tbpaper{border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+[data-skin="vidro"] .lib button{border-radius:12px;background:linear-gradient(145deg,#1E293B,#0F172A);border-color:rgba(148,163,184,.14)}
+[data-skin="forja"] .tbpaper{border-radius:14px}
 /* ---- Fingerpicking ---- */
 .fpgridwrap{overflow-x:auto;min-width:0}
 .fpgrid{display:grid;gap:3px;min-width:min-content;align-items:center}
@@ -969,6 +993,7 @@ body.noscroll{overflow:hidden}
         <button type="button" id="tab-prog" data-v="prog" data-g="tocar">Progressão</button>
         <button type="button" id="tab-song" data-v="song" data-g="tocar">Música</button>
         <button type="button" id="tab-find" data-v="find" data-g="tocar">Procurar músicas</button>
+        <button type="button" id="tab-tb" data-v="tb" data-g="tocar">Tablaturas</button>
         <button type="button" id="tab-dic" data-v="dic" data-g="acordes">Dicionário</button>
         <button type="button" id="tab-tri" data-v="tri" data-g="acordes">Tríades</button>
         <button type="button" id="tab-arp" data-v="arp" data-g="acordes">Arpejos</button>
@@ -1367,6 +1392,9 @@ body.noscroll{overflow:hidden}
         <button type="button" class="ghost sm" id="fd-stop" hidden>Parar</button>
         <a class="ghost sm" id="fd-ug" target="_blank" rel="noopener noreferrer" href="https://www.ultimate-guitar.com/">Ultimate Guitar ↗</a>
         <a class="ghost sm" id="fd-cc" target="_blank" rel="noopener noreferrer" href="https://www.cifraclub.com.br/">Cifra Club ↗</a>
+        <a class="ghost sm" id="fd-ss" target="_blank" rel="noopener noreferrer" href="https://www.songsterr.com/">Songsterr ↗</a>
+        <a class="ghost sm" id="fd-ch" target="_blank" rel="noopener noreferrer" href="https://chordify.net/">Chordify ↗</a>
+        <a class="ghost sm" id="fd-yt" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/">Aulas no YouTube ↗</a>
       </div>
       <div class="field aipick"><label for="fd-ai">IA a usar</label><select id="fd-ai">
         <option value="auto">Automático (Claude; se faltar, a 1.ª IA com chave)</option>
@@ -1385,11 +1413,12 @@ body.noscroll{overflow:hidden}
     </section>
     <section class="panel full" aria-labelledby="h-fd-paste">
       <h3 id="h-fd-paste">Colar uma cifra</h3>
-      <p class="note">Copia a cifra de um site (com letra ou sem ela) e cola aqui. A app fica só com os acordes e as secções ([Verso], Refrão:, Intro…), um compasso por acorde, e lê a cejilla e o tom se a cifra os indicar.</p>
+      <p class="note">Copia a cifra de um site (com letra ou sem ela) e cola aqui. A app fica só com os acordes e as secções ([Verso], Refrão:, Intro…), um compasso por acorde, e lê a cejilla e o tom se a cifra os indicar. "Adicionar à biblioteca" guarda-a em Biblioteca › As minhas, sem a letra.</p>
       <textarea id="fd-paste" spellcheck="false" autocomplete="off" rows="6" placeholder="[Intro]&#10;Am  G  F  E&#10;&#10;[Verso]&#10;Am        G&#10;(a letra pode ficar, é ignorada)"></textarea>
       <div class="actions">
         <input type="text" id="fd-pname" maxlength="60" placeholder="Nome da música" aria-label="Nome da música">
         <button type="button" class="primary" id="fd-conv">Converter e abrir na Música</button>
+        <button type="button" class="ghost sm" id="fd-add">Adicionar à biblioteca</button>
       </div>
       <p class="songmsg ok" id="fd-pmsg" role="status"></p>
     </section>
@@ -1494,6 +1523,51 @@ body.noscroll{overflow:hidden}
       <h3 id="h-songs">As minhas músicas</h3>
       <p class="status" id="songs-status"></p>
       <ul class="favlist songlist" id="songs-list"></ul>
+    </section>
+  </div>
+
+  <div class="view train" id="view-tb" hidden>
+    <div class="trainhead"><h2>Tablaturas</h2><p class="note">Abre um ficheiro Guitar Pro (do Songsterr, do Ultimate Guitar ou de outro site) ou cola uma tablatura em texto. A app desenha-a e toca-a com um cursor, mais devagar se quiseres, e repete o trecho que escolheres.</p></div>
+    <section class="panel full" aria-labelledby="h-tb-open">
+      <h3 id="h-tb-open">Abrir uma tablatura</h3>
+      <div class="actions">
+        <label class="primary tbfile" for="tb-file" tabindex="0" role="button">Abrir ficheiro Guitar Pro…</label>
+        <input type="file" id="tb-file" accept=".gp,.gp3,.gp4,.gp5,.gpx,.gp7,.gp8,.musicxml,.mxl,.xml" hidden>
+        <button type="button" class="ghost sm" id="tb-demo">Exemplo</button>
+        <a class="ghost sm" id="tb-ss" target="_blank" rel="noopener noreferrer" href="https://www.songsterr.com/">Songsterr ↗</a>
+        <a class="ghost sm" id="tb-ug" target="_blank" rel="noopener noreferrer" href="https://www.ultimate-guitar.com/">Ultimate Guitar ↗</a>
+      </div>
+      <p class="note">Lê Guitar Pro 3 a 8 (.gp3, .gp4, .gp5, .gpx, .gp) e MusicXML. No Songsterr, o ficheiro Guitar Pro descarrega-se na página da tablatura (precisa da conta Plus); no Ultimate Guitar, nas tablaturas do tipo "Guitar Pro". Os botões dos sites procuram a música escrita em Procurar músicas.</p>
+      <details class="tbtxt" id="tb-txtbox">
+        <summary>Colar uma tablatura em texto</summary>
+        <textarea id="tb-txt" spellcheck="false" autocomplete="off" rows="8" placeholder="e|-----------------5-8-|&#10;B|-------------5-8-----|&#10;G|---------5-7---------|&#10;D|-----5-7-------------|&#10;A|-5-7-----------------|&#10;E|---------------------|"></textarea>
+        <div class="actions">
+          <input type="text" id="tb-tname" maxlength="60" placeholder="Nome da música" aria-label="Nome da tablatura">
+          <button type="button" class="primary" id="tb-txtgo">Mostrar e ouvir</button>
+        </div>
+        <p class="songmsg ok" id="tb-txtmsg" role="status"></p>
+        <p class="note">Lê blocos de seis linhas (e B G D A E, ou outra afinação escrita à esquerda), com números de casa, h e p (ligados), / e \ (slides), b (bends, como 7b9), ~ (vibrato) e x (notas abafadas). A letra e as outras linhas são ignoradas. O texto não diz o ritmo: a app deduz as durações pelo espaçamento, por isso confirma de ouvido com a gravação.</p>
+      </details>
+    </section>
+    <section class="panel full" id="tb-player" aria-labelledby="h-tb-play" hidden>
+      <div class="tbhead"><div><h3 id="h-tb-play">Tablatura</h3><p class="note" id="tb-meta"></p></div>
+        <button type="button" class="ghost sm" id="tb-save">Guardar na biblioteca</button></div>
+      <div class="ctl">
+        <div class="field"><label for="tb-track">Instrumento</label><select id="tb-track"></select></div>
+        <div class="field"><span class="lbl" id="tb-vw-lbl">Mostrar</span>
+          <div class="seg txt" id="tb-vw" role="group" aria-labelledby="tb-vw-lbl"><button type="button" data-v="tab">Tablatura</button><button type="button" data-v="mix">Tab e pauta</button><button type="button" data-v="score">Pauta</button></div></div>
+        <div class="field"><label for="tb-speed">Andamento</label><div class="slider"><input type="range" id="tb-speed" min="25" max="150" step="5"><output id="tb-speed-out" for="tb-speed"></output></div></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="primary" id="tb-play">Tocar</button>
+        <button type="button" class="ghost sm" id="tb-stop">Do início</button>
+        <button type="button" class="chip" id="tb-loop" aria-pressed="false">Repetir</button>
+        <button type="button" class="chip" id="tb-metro" aria-pressed="false">Metrónomo</button>
+        <button type="button" class="chip" id="tb-count" aria-pressed="false">Contagem antes</button>
+      </div>
+      <p class="songmsg ok" id="tb-msg" role="status"></p>
+      <p class="hint">Toca num compasso para começar daí. Para treinar um trecho, arrasta por cima das notas para o selecionar e liga "Repetir".</p>
+      <div class="tbpaper"><div id="tb-at"></div></div>
     </section>
   </div>
 
@@ -2826,7 +2900,7 @@ const TH = (() => {
     suave:{name:'Suave', sw:['#E8838C','#7FC8A0','#F2C97A','#B7A3EC']}
   };
   const GRPS = [[0,1,2],[1,2,3],[2,3,4],[3,4,5]], GRPN = ['E A D','A D G','D G B','G B e'];
-  const VIEWS = ['prog','song','find','dic','ex','fla','tri','arp','met','tun','log','cof','nbr','tec','ref','fp','md'];
+  const VIEWS = ['prog','song','find','tb','dic','ex','fla','tri','arp','met','tun','log','cof','nbr','tec','ref','fp','md'];
   // Tipos de acorde do dicionário, pela ordem em que aparecem.
   const DQ = {
     maj:{name:'Maior', sfx:''}, min:{name:'Menor', sfx:'m'}, '7':{name:'Sétima (dominante)', sfx:'7'}, maj7:{name:'Sétima maior', sfx:'maj7'},
@@ -2958,11 +3032,14 @@ const TH = (() => {
     '5':[['pmin','os power chords pedem pentatónica menor'],['bmin','com a nota azul'],['pmaj','se a música for em tom maior']]
   };
   // Menus agrupados
-  const NAVG = {tocar:['prog','song','find'], acordes:['dic','tri','arp'], escalas:['ex','md','cof','nbr','ref'], ritmo:['fp','tec','met','fla'], ferr:['tun','log']};
-  const VIEWNAME = {prog:'Tocar › Progressão', song:'Tocar › Música', find:'Tocar › Procurar músicas', dic:'Acordes › Dicionário', tri:'Acordes › Tríades', arp:'Acordes › Arpejos',
+  const NAVG = {tocar:['prog','song','find','tb'], acordes:['dic','tri','arp'], escalas:['ex','md','cof','nbr','ref'], ritmo:['fp','tec','met','fla'], ferr:['tun','log']};
+  const VIEWNAME = {prog:'Tocar › Progressão', song:'Tocar › Música', find:'Tocar › Procurar músicas', tb:'Tocar › Tablaturas', dic:'Acordes › Dicionário', tri:'Acordes › Tríades', arp:'Acordes › Arpejos',
     ex:'Escalas › Escalas e modos', cof:'Escalas › Círculo de quintas', nbr:'Escalas › Notas no braço', ref:'Escalas › Folha de referência', md:'Escalas › Modos', tec:'Ritmo › Técnica', fp:'Ritmo › Fingerpicking', met:'Ritmo › Metrónomo', fla:'Ritmo › Flamenco', tun:'Ferramentas › Afinador', log:'Ferramentas › Registo'};
   // Índice de tudo o que a app faz: [título, vista, elemento, palavras-chave]
   const FINDER = [
+    ['Abrir tablatura Guitar Pro (Songsterr, Ultimate Guitar)','tb','#h-tb-open','tablatura tab guitar pro gp gp5 gpx songsterr ultimate guitar musicxml abrir ficheiro'],
+    ['Colar tablatura em texto e ouvir','tb','#tb-txtbox','tablatura tab texto colar ascii ouvir riff solo'],
+    ['Adicionar cifra à biblioteca','find','#h-fd-paste','cifra colar biblioteca guardar adicionar minhas músicas'],
     ['Gerar uma progressão de acordes','prog','#gen','progressão gerar tonalidade modo estilo'],
     ['Forma do blues: 12, 8, quick change, jazz, slow','prog','#style','blues 12 compassos quick change turnaround jazz blues 8 slow'],
     ['Segunda guitarra','prog','#h-g2','dueto duas guitarras segunda'],
@@ -3025,6 +3102,7 @@ const TH = (() => {
     tec:{kind:'perm', perm:0, leg:0, pat:0, ch:'Am', fret:5, sub:4, tempo:60, loop:true, accel:false, shift:false},
     goals:{hours:10, days:5, note:'', rec:{}},
     md:{fam:'greek', mode:'ion', root:0, sys:'4', shape:-1, lab:'deg', tempo:90, drone:false, donly:false, loop:true, cv:'par', ord:'deg'},
+    tb:{speed:100, vw:'tab', loop:false, metro:false, count:false},
     fp:{pat:'travis3', prog:'C Am F G', bars:1, tempo:70, loop:true, click:true, accel:false, custom:{m:'4/4', per:2, steps:['B','2','A','3','B','2','A','3']}},
     ref:{size:'dm90', or:'l', cw:90, ch:40, key:0, theme:'light', margin:10, bleed:0, title:'Guitarra · folha de referência', fmt:'pdf', dpi:200, items:['notes','chords','formula','cof','keys','diat','prog','pent','major','scales','int','caged']},
     print:{items:[], fmt:'html', paper:'a4', orient:'p', margin:'n', color:'color', size:'m', lab:'int', blank:'1', title:'Oficina de Acordes', name:'', date:true, pages:true, help:true, brk:false},
@@ -3138,6 +3216,8 @@ const TH = (() => {
     const MV = s.md && typeof s.md === 'object' ? s.md : {};
     s.md = {mode:typeof MV.mode === 'string' ? MV.mode.slice(0, 12) : 'ion', root:clamp(MV.root|0, 0, 11), sys:['4','3','caged'].includes(MV.sys) ? MV.sys : '4', shape:MV.shape === undefined ? -1 : clamp(MV.shape|0, -1, 7),
       lab:MV.lab === 'note' ? 'note' : 'deg', tempo:clamp(Math.round(+MV.tempo) || 90, 40, 200), drone:!!MV.drone, donly:!!MV.donly, loop:MV.loop !== false, cv:MV.cv === 'rel' ? 'rel' : 'par', ord:MV.ord === 'bright' ? 'bright' : 'deg'};
+    const TBV = s.tb && typeof s.tb === 'object' ? s.tb : {};
+    s.tb = {speed:clamp(Math.round(+TBV.speed) || 100, 25, 150), vw:['tab','mix','score'].includes(TBV.vw) ? TBV.vw : 'tab', loop:!!TBV.loop, metro:!!TBV.metro, count:!!TBV.count};
     const FPV = s.fp && typeof s.fp === 'object' ? s.fp : {}, FC = FPV.custom && typeof FPV.custom === 'object' ? FPV.custom : {};
     const fcm = ['4/4','3/4','6/8'].includes(FC.m) ? FC.m : '4/4', fcp = FC.m === '6/8' ? 3 : [2,4].includes(+FC.per) ? +FC.per : 2, fcn = ({'4/4':4,'3/4':3,'6/8':2})[fcm] * fcp;
     s.fp = {pat:typeof FPV.pat === 'string' ? FPV.pat.slice(0, 20) : 'travis3', prog:typeof FPV.prog === 'string' ? FPV.prog.slice(0, 60) : 'C Am F G', bars:[1,2,4].includes(+FPV.bars) ? +FPV.bars : 1,
@@ -3851,7 +3931,7 @@ Regras:
   ];
   function renderLib(){
     const f = ($('#fd-filter').value || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-    let o = '';
+    let o = libMineHtml(f);
     LIBG.forEach(([g, name, how]) => {
       const items = LIB.map((x, i) => ({x, i})).filter(({x}) => (x.g || '') === g && (!f || (x.t + ' ' + x.a).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(f)));
       if (!items.length) return;
@@ -3863,6 +3943,9 @@ Regras:
     const q = encodeURIComponent($('#fd-q').value.trim());
     $('#fd-ug').href = q ? `https://www.ultimate-guitar.com/search.php?search_type=title&value=${q}` : 'https://www.ultimate-guitar.com/';
     $('#fd-cc').href = q ? `https://www.google.com/search?q=${encodeURIComponent($('#fd-q').value.trim() + ' cifra site:cifraclub.com.br')}` : 'https://www.cifraclub.com.br/';
+    $('#fd-ss').href = q ? `https://www.google.com/search?q=${encodeURIComponent($('#fd-q').value.trim() + ' site:songsterr.com')}` : 'https://www.songsterr.com/';
+    $('#fd-ch').href = q ? `https://www.google.com/search?q=${encodeURIComponent($('#fd-q').value.trim() + ' site:chordify.net')}` : 'https://chordify.net/';
+    $('#fd-yt').href = q ? `https://www.youtube.com/results?search_query=${encodeURIComponent($('#fd-q').value.trim() + ' aula guitarra')}` : 'https://www.youtube.com/';
     renderLib();
   }
   function wireFind(){
@@ -3873,13 +3956,311 @@ Regras:
     $('#fd-stop').addEventListener('click', () => { if (fdCtl) fdCtl.abort(); });
     $('#fd-result').addEventListener('click', e => { if (e.target.closest('#fd-open') && fdLast) loadSongData(fdLast); });
     $('#fd-filter').addEventListener('input', renderLib);
-    $('#fd-lib').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const x = LIB[+b.dataset.i];
+    $('#fd-lib').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.mine || b.dataset.del){ libMine(b); return; } const x = LIB[+b.dataset.i];
       loadSongData({name:x.t + ' — ' + x.a, text:x.s, key:x.k, tempo:x.bpm, meter:x.m, pat:x.p, capo:x.c || 0, feel:x.n ? 'Melodia tradicional. Acompanhamento simples proposto pela app (tónica, quarta e quinta): confirma-o a cantar.' : 'Versão simplificada da biblioteca: confirma de ouvido.'}); });
+    $('#fd-add').addEventListener('click', addCifra);
     $('#fd-conv').addEventListener('click', () => {
       const r = convertSheet($('#fd-paste').value);
       if (!r.text){ $('#fd-pmsg').className = 'songmsg'; $('#fd-pmsg').textContent = 'Não encontrei linhas só com acordes. Confirma que a cifra tem os acordes em linhas próprias.'; return; }
       loadSongData({name:$('#fd-pname').value.trim() || 'Cifra colada', text:r.text, key:r.key, tempo:S.song.tempo, meter:S.song.beats === 3 ? '3/4' : '4/4', pat:S.song.pat, capo:r.capo, feel:'Convertida de uma cifra colada: um compasso por acorde. Ajusta as barras no texto se for preciso.'});
     });
+  }
+
+  /* ---------- Tablaturas: Guitar Pro e MusicXML (alphaTab), tablatura em texto e biblioteca pessoal ---------- */
+  const AT_CDN = 'https://cdn.jsdelivr.net/npm/@coderline/alphatab@1.8.4/dist/';
+  const AT_BASE = location.protocol === 'file:' ? AT_CDN : 'libs/alphatab/';
+  const TBKEY = 'oficina-tablaturas-v1';
+  let tabs = [], tbApi = null, tbAtP = null, tbCur = null, tbPlayerOk = false, tbSoundT = 0, libArmed = null, tbOpenSeq = 0;
+  try { const v = JSON.parse(localStorage.getItem(TBKEY) || '[]'); if (Array.isArray(v)) tabs = v.filter(t => t && t.id && (t.kind === 'gp' || (t.kind === 'txt' && typeof t.tex === 'string'))); } catch (e) {}
+  const tbWrite = () => { try { localStorage.setItem(TBKEY, JSON.stringify(tabs)); } catch (e) {} };
+  const atUrl = p => new URL(AT_BASE + p, location.href).href;
+  const TBVW = {tab:'Tab', mix:'ScoreTab', score:'Score'};
+
+  // Ficheiros Guitar Pro guardados no IndexedDB (podem ter centenas de KB: não cabem bem no localStorage).
+  let tbDbP = null;
+  function tbDb(){
+    if (!tbDbP) tbDbP = new Promise((ok, ko) => {
+      let r; try { r = indexedDB.open('oficina-tablaturas', 1); } catch (e) { ko(e); return; }
+      r.onupgradeneeded = () => r.result.createObjectStore('files');
+      r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error);
+    }).catch(e => { tbDbP = null; throw e; });
+    return tbDbP;
+  }
+  async function idbDo(mode, fn){
+    const db = await tbDb();
+    return new Promise((ok, ko) => {
+      const tx = db.transaction('files', mode), st = tx.objectStore('files'), q = fn(st);
+      tx.oncomplete = () => ok(q && 'result' in q ? q.result : undefined); tx.onerror = () => ko(tx.error); tx.onabort = () => ko(tx.error);
+    });
+  }
+  const idbGet = id => idbDo('readonly', st => st.get(id));
+  const idbPut = (id, v) => idbDo('readwrite', st => st.put(v, id));
+  const idbDel = id => idbDo('readwrite', st => st.delete(id));
+  function u8ToB64(u){ let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); }
+  function b64ToU8(b){ const s = atob(b), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; }
+
+  // Cópias de segurança: as tablaturas vão dentro do .json (os ficheiros Guitar Pro em base64).
+  async function tbExport(){
+    const out = [];
+    for (const t of tabs){
+      const o = Object.assign({}, t);
+      if (t.kind === 'gp'){ try { const b = await idbGet(t.id); if (!b) continue; o.data = u8ToB64(b instanceof Uint8Array ? b : new Uint8Array(b)); } catch (e) { continue; } }
+      out.push(o);
+    }
+    return out;
+  }
+  async function tbImport(list){
+    let n = 0;
+    for (const t of Array.isArray(list) ? list : []){
+      if (!t || typeof t.id !== 'string' || tabs.some(y => y.id === t.id)) continue;
+      if (t.kind === 'gp'){ if (typeof t.data !== 'string') continue; try { await idbPut(t.id, b64ToU8(t.data)); } catch (e) { continue; } }
+      else if (t.kind !== 'txt' || typeof t.tex !== 'string') continue;
+      const o = Object.assign({}, t); delete o.data; o.name = String(o.name || 'Tablatura').slice(0, 80); tabs.push(o); n++;
+    }
+    if (n){ tabs.sort((a, b) => (b.created || 0) - (a.created || 0)); tbWrite(); if (S.view === 'find') renderLib(); }
+    return n;
+  }
+
+  // ---- Tablatura em texto → alphaTex ----
+  const TB_STD = ['E4','B3','G3','D3','A2','E2'];
+  const TB_FLAT = {DB:'C#', EB:'D#', GB:'F#', AB:'G#', BB:'A#'};
+  function tbLine(l){
+    const m = /^\s*([A-Ga-g][#b]?)?\s*[|:]?/.exec(l), body = l.slice(m[0].length).replace(/\s+$/, '');
+    if ((body.match(/-/g) || []).length < 4 || /[^\-0-9|hpbrxX\/\\~()<>.*^=sS ]/.test(body)) return null;
+    return {name:m[1] || '', body};
+  }
+  function tbParseText(raw, name){
+    const lines = String(raw || '').replace(/\t/g, '    ').split(/\r?\n/), blocks = [];
+    let run = [];
+    const close = () => { for (let i = 0; i + 6 <= run.length; i += 6) blocks.push(run.slice(i, i + 6)); run = []; };
+    lines.forEach(l => { const t = tbLine(l); if (t) run.push(t); else close(); });
+    close();
+    if (!blocks.length) return {err:'Não encontrei blocos de seis linhas de tablatura (e|---, B|---, …).'};
+    // Afinação: as letras à esquerda do primeiro bloco, se forem todas diferentes da afinação normal.
+    let tuning = '';
+    const nm = blocks[0].map(x => x.name.toUpperCase());
+    if (nm.every(Boolean) && nm.join() !== 'E,B,G,D,A,E'){
+      const oct = [4,3,3,3,2,2];
+      tuning = nm.map((n, i) => (TB_FLAT[n] || n) + (n[0] === 'B' && i === 0 ? 3 : n[0] === 'C' && i >= 4 ? 3 : oct[i])).join(' ');
+    }
+    const bars = [], gaps = [];
+    let nNotes = 0;
+    blocks.forEach(B => {
+      const L = Math.max(...B.map(x => x.body.length)), rows = B.map(x => x.body.padEnd(L, '-')), notes = [], barHits = new Map();
+      rows.forEach((r, s) => {
+        let i = 0;
+        while (i < L){
+          const ch = r[i];
+          if (ch === '|'){ barHits.set(i, (barHits.get(i) || 0) + 1); i++; continue; }
+          if (ch === 'x' || ch === 'X'){ notes.push({col:i, s, dead:true, w:1}); i++; continue; }
+          if (ch >= '0' && ch <= '9'){
+            let j = i + 1;
+            if (r[j] >= '0' && r[j] <= '9' && +(ch + r[j]) <= 24) j++;
+            const n = {col:i, s, fret:+r.slice(i, j), w:j - i};
+            const t = r[j];
+            if (t === 'h' || t === 'p'){ n.h = true; j++; }
+            else if (t === '/' || t === '\\' || t === 's' || t === 'S'){ n.sl = true; j++; }
+            else if (t === 'b'){
+              j++; let k = j; while (k < L && r[k] >= '0' && r[k] <= '9' && k - j < 2) k++;
+              const tgt = k > j ? +r.slice(j, k) : n.fret + 2; n.bend = clamp((tgt - n.fret) * 2, 1, 8); j = k;
+              if (r[j] === 'r'){ j++; while (j < L && r[j] >= '0' && r[j] <= '9') j++; }
+            } else if (t === '~'){ n.v = true; j++; }
+            notes.push(n); i = j; continue;
+          }
+          i++;
+        }
+      });
+      // Notas da mesma coluna (ou desalinhadas de uma casa por causa dos números de dois algarismos) tocam juntas.
+      notes.sort((a, b) => a.col - b.col || a.s - b.s);
+      const evs = [];
+      notes.forEach(n => {
+        const e = evs[evs.length - 1];
+        if (e && (n.col === e.col || (n.col - e.col === 1 && (n.w > 1 || e.notes.some(x => x.w > 1)))) && !e.notes.some(x => x.s === n.s)) e.notes.push(n);
+        else evs.push({col:n.col, notes:[n]});
+      });
+      const cuts = [...barHits.entries()].filter(([, k]) => k >= 3).map(([c]) => c).sort((a, b) => a - b);
+      const edges = [0].concat(cuts.filter(c => c > 0)).concat(cuts.includes(L - 1) ? [] : [L]);
+      for (let b = 0; b + 1 < edges.length; b++){
+        const a = edges[b], z = edges[b + 1], inBar = evs.filter(e => e.col >= a && e.col < z);
+        if (!inBar.length && z - a < 4) continue;
+        inBar.forEach((e, k) => { e.gap = (k + 1 < inBar.length ? inBar[k + 1].col : z) - e.col; if (k + 1 < inBar.length) gaps.push(e.gap); });
+        bars.push(inBar); nNotes += inBar.reduce((s, e) => s + e.notes.length, 0);
+      }
+    });
+    if (!nNotes) return {err:'Encontrei as linhas da tablatura, mas nenhum número de casa.'};
+    const sg = gaps.slice().sort((a, b) => a - b), unit = sg.length ? Math.max(1, sg[Math.floor(sg.length / 2)]) : 2;
+    const dur = g => { const r = g / unit; return r <= .7 ? 16 : r <= 1.4 ? 8 : r <= 2.8 ? 4 : r <= 5.5 ? 2 : 1; };
+    const nt = n => {
+      const fx = [];
+      if (n.h) fx.push('h'); if (n.sl) fx.push('sl'); if (n.v) fx.push('v'); if (n.bend) fx.push(`b (0 ${n.bend})`);
+      return (n.dead ? 'x' : n.fret) + '.' + (n.s + 1) + (fx.length ? `{${fx.join(' ')}}` : '');
+    };
+    const q = s => String(s || '').replace(/["\\]/g, '');
+    const body = bars.map(bar => bar.length ? bar.map(e => `:${dur(e.gap)} ` + (e.notes.length > 1 ? `(${e.notes.map(nt).join(' ')})` : nt(e.notes[0]))).join(' ') : ':1 r').join(' | ');
+    const tex = `\\title "${q(name) || 'Tablatura'}" \\tempo 90${tuning ? ' \\tuning ' + tuning : ''} . ${body} |`;
+    const text = blocks.map(B => B.map(x => (x.name || ' ') + '|' + x.body).join('\n')).join('\n\n');
+    return {tex, text, bars:bars.length, notes:nNotes, tuning};
+  }
+
+  // ---- alphaTab ----
+  function loadAT(){
+    if (window.alphaTab) return Promise.resolve();
+    if (!tbAtP) tbAtP = new Promise((ok, ko) => {
+      const s = document.createElement('script'); s.src = atUrl('alphaTab.min.js');
+      s.onload = () => window.alphaTab ? ok() : ko(new Error('load'));
+      s.onerror = () => { tbAtP = null; s.remove(); ko(new Error('load')); };
+      document.head.appendChild(s);
+    });
+    return tbAtP;
+  }
+  function tbMsg(t, err){ $('#tb-msg').className = 'songmsg' + (err ? '' : ' ok'); $('#tb-msg').textContent = t || ''; }
+  async function tbEnsure(){
+    await loadAT();
+    if (tbApi) return tbApi;
+    const A = window.alphaTab, T = S.tb;
+    tbApi = new A.AlphaTabApi($('#tb-at'), {
+      core:{fontDirectory:atUrl('font/'), scriptFile:atUrl('alphaTab.min.js'), useWorkers:false, engine:'svg'},
+      display:{staveProfile:TBVW[T.vw], scale:innerWidth < 600 ? .72 : .95},
+      notation:{rhythmMode:'ShowWithBars'},
+      player:{enablePlayer:true, enableCursor:true, enableUserInteraction:true, soundFont:atUrl('soundfont/sonivox.sf2'), outputMode:A.PlayerOutputMode.WebAudioScriptProcessor, scrollOffsetY:-90}
+    });
+    tbApi.scoreLoaded.on(sc => {
+      if (!tbCur) return;
+      if (tbCur.kind === 'gp'){ tbCur.title = sc.title || tbCur.name; tbCur.artist = sc.artist || ''; }
+      $('#h-tb-play').textContent = tbCur.title || tbCur.name || 'Tablatura';
+      const meta = [tbCur.artist, sc.tempo ? sc.tempo + ' BPM' : '', sc.masterBars.length + (sc.masterBars.length === 1 ? ' compasso' : ' compassos'), tbCur.kind === 'txt' && tbCur.text ? 'ritmo deduzido do espaçamento' : ''].filter(Boolean);
+      $('#tb-meta').textContent = meta.join(' · ');
+      let gi = sc.tracks.findIndex(t => t.staves.some(st => st.tuning && st.tuning.length === 6));
+      if (gi < 0) gi = sc.tracks.findIndex(t => t.staves.some(st => st.isStringed || st.showTablature));
+      $('#tb-track').innerHTML = sc.tracks.map((t, i) => `<option value="${i}">${esc(t.name || 'Faixa ' + (i + 1))}</option>`).join('');
+      $('#tb-track').value = String(Math.max(0, gi)); $('#tb-track').disabled = sc.tracks.length < 2;
+      if (gi > 0) setTimeout(() => tbApi.renderTracks([sc.tracks[gi]]), 0);
+    });
+    tbApi.error.on(() => { tbMsg('Não consegui ler esta tablatura. Confirma que é um ficheiro Guitar Pro (.gp3 a .gp) ou MusicXML.', true); });
+    tbApi.playerReady.on(() => { tbPlayerOk = true; clearTimeout(tbSoundT); if (/som/.test($('#tb-msg').textContent)) tbMsg(''); tbApply(); });
+    tbApi.playerStateChanged.on(e => { $('#tb-play').textContent = e.state === 1 ? 'Pausa' : 'Tocar'; });
+    return tbApi;
+  }
+  function tbApply(){
+    if (!tbApi) return;
+    const T = S.tb;
+    try { tbApi.playbackSpeed = T.speed / 100; tbApi.isLooping = T.loop; tbApi.metronomeVolume = T.metro ? 1 : 0; tbApi.countInVolume = T.count ? 1 : 0; } catch (e) {}
+  }
+  function tbPause(){ try { if (tbApi && tbApi.playerState === 1) tbApi.pause(); } catch (e) {} }
+  async function tbOpen(entry){
+    const seq = ++tbOpenSeq;
+    if (S.view !== 'tb') setView('tb');
+    tbCur = entry; $('#tb-player').hidden = false; $('#h-tb-play').textContent = entry.name || 'Tablatura'; $('#tb-meta').textContent = '';
+    tbMsg('A preparar a tablatura…');
+    try { await tbEnsure(); }
+    catch (e) { tbMsg('Não foi possível carregar o leitor de tablaturas. Confirma a ligação à internet e tenta outra vez.', true); return; }
+    if (seq !== tbOpenSeq) return;
+    tbPause(); tbMsg('');
+    if (entry.kind === 'gp') tbApi.load(entry.bytes); else tbApi.tex(entry.tex);
+    renderTb();
+    if (!tbPlayerOk){ clearTimeout(tbSoundT); tbSoundT = setTimeout(() => { if (!tbPlayerOk) tbMsg('O som das tablaturas não arrancou nesta vista (o browser pode estar a bloqueá-lo). A tablatura vê-se na mesma; na app Android e na HTML aberta no PC o som funciona.', true); }, 12000); }
+    $('#tb-player').scrollIntoView({block:'start', behavior:'smooth'});
+  }
+  async function tbOpenSaved(id){
+    const t = tabs.find(x => x.id === id); if (!t) return;
+    if (t.kind === 'txt'){ tbOpen({kind:'txt', id, name:t.name, title:t.name, tex:t.tex, text:t.text}); return; }
+    try { const b = await idbGet(id); if (!b) throw new Error('missing'); tbOpen({kind:'gp', id, name:t.name, bytes:b instanceof Uint8Array ? b : new Uint8Array(b)}); }
+    catch (e) { setView('find'); $('#fd-lib').scrollIntoView({block:'start'}); }
+  }
+  async function tbSave(){
+    const c = tbCur; if (!c) return;
+    const name = String(c.title || c.name || 'Tablatura').slice(0, 80);
+    const old = c.id ? tabs.find(x => x.id === c.id) : tabs.find(x => x.kind === c.kind && x.name === name);
+    const id = old ? old.id : 'tab-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    const o = {id, kind:c.kind, name, artist:String(c.artist || '').slice(0, 80), created:old ? old.created : Date.now()};
+    if (c.kind === 'gp'){
+      try { await idbPut(id, c.bytes); } catch (e) { tbMsg('Não foi possível guardar o ficheiro neste browser (o armazenamento pode estar desligado ou cheio).', true); return; }
+      o.size = c.bytes.length;
+    } else { o.tex = c.tex; o.text = c.text; }
+    tabs = [o].concat(tabs.filter(x => x.id !== id)); tbWrite(); c.id = id;
+    tbMsg(old ? 'Tablatura atualizada na biblioteca.' : 'Guardada na biblioteca, em Procurar músicas › Biblioteca › As minhas.');
+  }
+  function renderTb(){
+    const T = S.tb;
+    segMark('#tb-vw', T.vw);
+    $('#tb-speed').value = T.speed; $('#tb-speed-out').textContent = T.speed + '%';
+    $('#tb-loop').setAttribute('aria-pressed', T.loop); $('#tb-metro').setAttribute('aria-pressed', T.metro); $('#tb-count').setAttribute('aria-pressed', T.count);
+    const q = ($('#fd-q').value || '').trim();
+    $('#tb-ss').href = q ? `https://www.google.com/search?q=${encodeURIComponent(q + ' site:songsterr.com')}` : 'https://www.songsterr.com/';
+    $('#tb-ug').href = q ? `https://www.ultimate-guitar.com/search.php?search_type=title&value=${encodeURIComponent(q)}` : 'https://www.ultimate-guitar.com/';
+    $('#tb-player').hidden = !tbCur;
+  }
+  const TB_DEMO = '\\title "Exercício: pentatónica de Lá menor" \\artist "Oficina de Acordes" \\tempo 80 . :8 5.6 8.6 5.5 7.5 5.4 7.4 5.3 7.3 | :8 5.2 8.2 5.1 8.1 :4 8.1{b (0 4)} 5.1 | :8 7.3{h} 9.3 5.2 8.2{p} 5.2 7.3 5.3 7.4 | :2 5.4 :4 (5.6 7.5 7.4) r |';
+  function wireTb(){
+    $('#tb-file').addEventListener('change', e => {
+      const f = e.target.files && e.target.files[0]; e.target.value = ''; if (!f) return;
+      if (f.size > 15 * 1024 * 1024){ tbMsg('Ficheiro grande demais (mais de 15 MB).', true); return; }
+      const fr = new FileReader();
+      fr.onload = () => tbOpen({kind:'gp', name:f.name.replace(/\.[^.]+$/, ''), bytes:new Uint8Array(fr.result)});
+      fr.onerror = () => tbMsg('Não foi possível ler o ficheiro.', true);
+      fr.readAsArrayBuffer(f);
+    });
+    $('.tbfile').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('#tb-file').click(); } });
+    $('#tb-demo').addEventListener('click', () => tbOpen({kind:'txt', name:'Exercício: pentatónica de Lá menor', title:'Exercício: pentatónica de Lá menor', artist:'Oficina de Acordes', tex:TB_DEMO, text:''}));
+    $('#tb-txtgo').addEventListener('click', () => {
+      const name = $('#tb-tname').value.trim() || 'Tablatura colada', r = tbParseText($('#tb-txt').value, name);
+      $('#tb-txtmsg').className = 'songmsg' + (r.err ? '' : ' ok');
+      if (r.err){ $('#tb-txtmsg').textContent = r.err; return; }
+      $('#tb-txtmsg').textContent = `${r.bars} ${r.bars === 1 ? 'compasso' : 'compassos'}, ${r.notes} notas${r.tuning ? ', afinação ' + r.tuning : ''}.`;
+      tbOpen({kind:'txt', name, title:name, tex:r.tex, text:r.text});
+    });
+    $('#tb-save').addEventListener('click', tbSave);
+    $('#tb-play').addEventListener('click', () => { if (!tbApi) return; if (!tbPlayerOk){ tbMsg('O som ainda está a carregar…'); return; } tbApply(); tbApi.playPause(); });
+    $('#tb-stop').addEventListener('click', () => { if (tbApi) tbApi.stop(); });
+    $('#tb-track').addEventListener('change', e => { if (tbApi && tbApi.score) tbApi.renderTracks([tbApi.score.tracks[+e.target.value]]); });
+    $('#tb-vw').addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return; S.tb.vw = b.dataset.v; segMark('#tb-vw', S.tb.vw); save();
+      if (tbApi && window.alphaTab){ tbApi.settings.display.staveProfile = window.alphaTab.StaveProfile[TBVW[S.tb.vw]]; tbApi.updateSettings(); tbApi.render(); }
+    });
+    $('#tb-speed').addEventListener('input', e => { S.tb.speed = clamp(+e.target.value, 25, 150); $('#tb-speed-out').textContent = S.tb.speed + '%'; tbApply(); save(); });
+    [['#tb-loop','loop'], ['#tb-metro','metro'], ['#tb-count','count']].forEach(([id, k]) => $(id).addEventListener('click', () => { S.tb[k] = !S.tb[k]; $(id).setAttribute('aria-pressed', S.tb[k]); tbApply(); save(); }));
+  }
+
+  // ---- Biblioteca pessoal: cifras e músicas guardadas + tablaturas ----
+  function libMineHtml(f){
+    const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const items = songs.map(s => ({k:'song', id:s.id, t:s.name || 'Sem nome', sub:(s.src === 'cifra' ? 'Cifra · ' : 'Música · ') + String(s.text || '').replace(/\[[^\]]*\]|\|/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 48)}))
+      .concat(tabs.map(t => ({k:'tab', id:t.id, t:t.name, sub:(t.kind === 'gp' ? 'Guitar Pro' : 'Tablatura em texto') + (t.artist ? ' · ' + t.artist : '')})))
+      .filter(x => !f || norm(x.t + ' ' + x.sub).includes(f));
+    if (!items.length && f) return '';
+    const where = cloud.ready ? 'As cifras e músicas sincronizam com a tua conta; as tablaturas ficam neste dispositivo.' : 'Ficam neste dispositivo e entram nas cópias de segurança (Ferramentas › Registo).';
+    return `<li class="libh">As minhas<i>Cifras que adicionaste, músicas guardadas no separador Música e tablaturas. ${where}</i></li>` + (items.length ? items.map(x => {
+      const key = x.k + ':' + x.id, armed = libArmed === key;
+      return `<li class="libmine"><button type="button" data-mine="${x.k}" data-id="${esc(x.id)}"><b>${esc(x.t)}</b><small>${esc(x.sub)}</small></button>`
+        + `<button type="button" class="libdel${armed ? ' warn' : ''}" data-del="${x.k}" data-id="${esc(x.id)}" aria-label="${armed ? 'Confirmar: apagar' : 'Apagar'} ${esc(x.t)}">${armed ? 'Apagar?' : '×'}</button></li>`;
+    }).join('') : '<li class="status libempty">Ainda não guardaste nada. Cola uma cifra e usa "Adicionar à biblioteca", ou abre uma tablatura em Tocar › Tablaturas.</li>');
+  }
+  function libMine(b){
+    const k = b.dataset.mine || b.dataset.del, id = b.dataset.id;
+    if (b.dataset.del){
+      const key = k + ':' + id;
+      if (libArmed !== key){ libArmed = key; renderLib(); return; }
+      libArmed = null;
+      if (k === 'song'){ songArmed = id; delSong(id); }
+      else { tabs = tabs.filter(x => x.id !== id); tbWrite(); idbDel(id).catch(() => {}); if (tbCur && tbCur.id === id) delete tbCur.id; }
+      renderLib(); return;
+    }
+    libArmed = null;
+    if (k === 'song'){ setView('song'); openSong(id); } else tbOpenSaved(id);
+  }
+  // Cifra colada → biblioteca (fica como música guardada: só acordes e secções, sem letra).
+  function addCifra(){
+    const r = convertSheet($('#fd-paste').value);
+    if (!r.text){ $('#fd-pmsg').className = 'songmsg'; $('#fd-pmsg').textContent = 'Não encontrei linhas só com acordes. Confirma que a cifra tem os acordes em linhas próprias.'; return; }
+    const name = ($('#fd-pname').value.trim() || 'Cifra colada').slice(0, 60), kc = r.key ? TH.parseChord(r.key) : null;
+    const f = {kind:'song', created:Date.now(), name, text:r.text, beats:S.song.beats === 3 ? 3 : 4, tempo:S.song.tempo,
+      key:kc ? kc.pc + ':' + (['min','m7','m6'].includes(kc.q) ? 'aeo' : 'ion') : 'auto', vo:{}, pat:S.song.pat, capo:r.capo, src:'cifra'};
+    const old = songs.find(x => (x.name || '') === name), id = old ? old.id : 'song-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    songs = sortSongs([Object.assign({id}, f)].concat(songs.filter(x => x.id !== id)));
+    if (cloud.col) cloudDo(() => cloud.col.doc(id).set(f)); else writeLocal(SONGKEY, songs);
+    renderSongs(); renderLib();
+    $('#fd-pmsg').className = 'songmsg ok';
+    $('#fd-pmsg').textContent = `"${name}" ${old ? 'atualizada' : 'adicionada'} na biblioteca, em As minhas (${r.text.split('\n').filter(l => l.startsWith('|')).length} linhas de acordes${r.capo ? ', cejilla na casa ' + r.capo : ''}). A letra não foi guardada.`;
   }
 
   /* ---------- Música: acordes de uma canção, folha de acordes e forma para solar ---------- */
@@ -4196,7 +4577,8 @@ Regras:
     const G = S.song; if (!G.text.trim()) return;
     const old = songs.find(x => (x.name || '') === G.name && G.name);
     const id = old ? old.id : 'song-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    const f = {kind:'song', created:Date.now(), name:G.name, text:G.text, beats:G.beats, tempo:G.tempo, key:G.key, vo:clone(G.vo)};
+    const f = {kind:'song', created:Date.now(), name:G.name, text:G.text, beats:G.beats, tempo:G.tempo, key:G.key, vo:clone(G.vo), pat:G.pat, capo:G.capo};
+    if (old && old.src) f.src = old.src;
     songs = sortSongs([Object.assign({id}, f)].concat(songs.filter(x => x.id !== id)));
     if (cloud.col) cloudDo(() => cloud.col.doc(id).set(f)); else writeLocal(SONGKEY, songs);
     renderSongs(); $('#song-msg').className = 'songmsg ok'; $('#song-msg').textContent = old ? 'Música atualizada.' : 'Música guardada.';
@@ -4205,6 +4587,8 @@ Regras:
     const f = songs.find(x => x.id === id); if (!f) return;
     trStop(); Object.assign(S.song, {text:String(f.text || ''), name:String(f.name || ''), beats:[2,3,4,6].includes(f.beats) ? f.beats : 4,
       tempo:clamp(+f.tempo || 80, 40, 260), key:typeof f.key === 'string' ? f.key : 'auto', vo:f.vo && typeof f.vo === 'object' ? clone(f.vo) : {}});
+    if (typeof f.pat === 'string' && /^[DU.X]{2,24}$/.test(f.pat)) Object.assign(S.song, {strum:'pat', pat:f.pat});
+    if (f.capo !== undefined) S.song.capo = clamp(+f.capo || 0, 0, 7);
     songSel = 0; $('#song-text').value = S.song.text; $('#song-name').value = S.song.name; renderSong(); save();
     $('#song-text').scrollIntoView({block:'center', behavior:'smooth'});
   }
@@ -5318,7 +5702,7 @@ Regras:
   function bkMsg(t, err){ $('#bk-msg').className = 'songmsg' + (err ? '' : ' ok'); $('#bk-msg').textContent = t; }
   async function saveBackup(){
     const d = new Date(), stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    const data = JSON.stringify({app:BKAPP, version:1, saved:d.toISOString(), settings:JSON.parse(snapshot()), favs, songs, practice}, null, 1);
+    const data = JSON.stringify({app:BKAPP, version:1, saved:d.toISOString(), settings:JSON.parse(snapshot()), favs, songs, practice, tabs:await tbExport()}, null, 1);
     const filename = `oficina-acordes-${stamp}.json`;
     let dl = null; try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) {}
     if (dl){
@@ -5338,9 +5722,9 @@ Regras:
       let x = null; try { x = JSON.parse(fr.result); } catch (e) {}
       if (!x || x.app !== BKAPP){ bkPending = null; $('#bk-ask').hidden = true; bkMsg('Este ficheiro não é uma cópia da Oficina de Acordes.', true); return; }
       bkPending = x;
-      const nf = Array.isArray(x.favs) ? x.favs.length : 0, ns = Array.isArray(x.songs) ? x.songs.length : 0, nd = x.practice && x.practice.days ? Object.keys(x.practice.days).length : 0;
+      const nt = Array.isArray(x.tabs) ? x.tabs.length : 0, nf = Array.isArray(x.favs) ? x.favs.length : 0, ns = Array.isArray(x.songs) ? x.songs.length : 0, nd = x.practice && x.practice.days ? Object.keys(x.practice.days).length : 0;
       const when = x.saved ? new Date(x.saved).toLocaleString('pt-PT', {dateStyle:'medium', timeStyle:'short'}) : '?';
-      bkMsg(`Cópia de ${when}: ${nf} ${nf === 1 ? 'favorito' : 'favoritos'}, ${ns} ${ns === 1 ? 'música' : 'músicas'}, ${nd} ${nd === 1 ? 'dia' : 'dias'} de registo. "Juntar" acrescenta o que falta e mantém as tuas definições; "Repor tudo" troca também as definições.`);
+      bkMsg(`Cópia de ${when}: ${nf} ${nf === 1 ? 'favorito' : 'favoritos'}, ${ns} ${ns === 1 ? 'música' : 'músicas'}, ${nt} ${nt === 1 ? 'tablatura' : 'tablaturas'}, ${nd} ${nd === 1 ? 'dia' : 'dias'} de registo. "Juntar" acrescenta o que falta e mantém as tuas definições; "Repor tudo" troca também as definições.`);
       $('#bk-ask').hidden = false;
     };
     fr.onerror = () => bkMsg('Não foi possível ler o ficheiro.', true);
@@ -5359,6 +5743,7 @@ Regras:
       songs.push(f); ns++; if (cloud.col){ const o = Object.assign({}, f); delete o.id; cloudDo(() => cloud.col.doc(f.id).set(o)); }
     });
     songs = sortSongs(songs);
+    if (Array.isArray(x.tabs) && x.tabs.length) tbImport(x.tabs);
     const days = Object.assign({}, practice.days), od = x.practice && x.practice.days || {};
     Object.keys(od).forEach(k => { if (/^\d{4}-\d{2}-\d{2}$/.test(k) && (+od[k] || 0) > (days[k] || 0)) days[k] = Math.round(+od[k]); });
     practice = {days};
@@ -5789,11 +6174,11 @@ Regras:
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !menu.hidden){ close(); btn.focus(); } });
   }
   function setView(v){
-    stop(); trStop(); S.view = v;
+    stop(); trStop(); tbPause(); S.view = v;
     S.navLast = Object.assign({}, S.navLast, {[groupOf(v)]:v});
     VIEWS.forEach(k => { $('#view-' + k).hidden = k !== v; });
     segMark('#tabs', v); renderNav();
-    const draw = {find:renderFind, song:renderSong, dic:renderDic, ex:renderEx, fla:renderFla, tri:renderTri, arp:renderArp, met:renderMet, tun:renderTun, log:renderLog, cof:renderCof, nbr:renderNb, tec:renderTec, ref:renderRef, fp:renderFp, md:renderMd}[v]; if (draw) draw();
+    const draw = {find:renderFind, song:renderSong, dic:renderDic, ex:renderEx, fla:renderFla, tri:renderTri, arp:renderArp, met:renderMet, tun:renderTun, log:renderLog, cof:renderCof, nbr:renderNb, tec:renderTec, ref:renderRef, fp:renderFp, md:renderMd, tb:renderTb}[v]; if (draw) draw();
     save();
   }
   function wireExtras(){
@@ -7360,7 +7745,7 @@ html,body{background:#fff;margin:0}
     });
   }
 
-  wire(); wireTrainers(); wireExtras(); wireStrumEdit(); wireG2(); wireSong(); wireBackup(); wirePal(); applyPalette(); renderRT(); wireMini(); wireLink(); wireFind(); wireLead(); wireEx(); wireDic(); wireNav(); wireGuide(); wireCof(); wireNb(); wireTec(); wireGoals(); wirePrint(); wireRef(); wireFp(); wireMd(); fixRhythmKeys(); refreshVoicings(false); renderAll(); renderFavs(); setPlayUi(false); setView(S.view);
+  wire(); wireTrainers(); wireExtras(); wireStrumEdit(); wireG2(); wireSong(); wireBackup(); wirePal(); applyPalette(); renderRT(); wireMini(); wireLink(); wireFind(); wireLead(); wireEx(); wireDic(); wireNav(); wireGuide(); wireCof(); wireNb(); wireTec(); wireGoals(); wirePrint(); wireRef(); wireFp(); wireMd(); wireTb(); fixRhythmKeys(); refreshVoicings(false); renderAll(); renderFavs(); setPlayUi(false); setView(S.view);
   booted = true; lastSet = snapshot();
   initCloud();
 })();

@@ -24,6 +24,10 @@ LIBS = {
     r'https://cdnjs\.cloudflare\.com/ajax/libs/html2canvas/[^"\'\s]+/html2canvas\.min\.js': 'libs/html2canvas.min.js',
 }
 FONTS = r'https://fonts\.googleapis\.com/css2\?[^"\']+'
+# alphaTab (tablaturas): local na APK; na HTML aberta como ficheiro (file://) continua a usar a CDN,
+# porque o browser não deixa ler a soundfont a partir de file://.
+AT_LINE = 'const AT_BASE = AT_CDN;'
+AT_LOCAL = "const AT_BASE = location.protocol === 'file:' ? AT_CDN : 'libs/alphatab/';"
 
 
 def main() -> int:
@@ -39,7 +43,11 @@ def main() -> int:
         html, n = re.subn(pat, local, html)
         print(f'{local}: {n} referência(s)')
 
-    left = re.findall(r'https://(?:cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)[^"\'\s]*', html)
+    n = html.count(AT_LINE)
+    html = html.replace(AT_LINE, AT_LOCAL)
+    print(f'libs/alphatab/: {n} referência(s)')
+
+    left = [u for u in re.findall(r'https://(?:cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)[^"\'\s`]*', html) if '@coderline/alphatab' not in u]
     if left:
         print('Aviso: ainda há bibliotecas na internet (a app precisa de rede para estas):', *sorted(set(left)), sep='\n  ')
 

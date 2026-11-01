@@ -37,6 +37,7 @@ O código da app não é alterado. Cada APK nova instala por cima da anterior e 
 | Guardar cópia, exportar PDF | Guarda em *Transferências/Oficina de Acordes* e abre a folha de partilha (OneDrive, Drive, e-mail…). |
 | Página para imprimir | Abre o diálogo de impressão do Android (inclui *Guardar como PDF*). |
 | Restaurar cópia | Abre o seletor de ficheiros do telemóvel. |
+| Tablaturas (Guitar Pro, MusicXML, texto) | Funcionam sem internet: o leitor alphaTab, a fonte de música e os sons vão dentro da APK. Os ficheiros .gp abrem-se pelo seletor de ficheiros do telemóvel. |
 | Sites de cifras e ligações externas | Abrem no browser do telemóvel. |
 | Sincronização dos favoritos com a conta | Não existe: tudo fica guardado no telemóvel. Para passar dados entre dispositivos, usa *Guardar cópia* e *Restaurar*. |
 | "Perguntar à IA" na procura de músicas | O Claude não está disponível na APK. Usa Qwen, DeepSeek ou Kimi com a tua chave de API (em *Procurar músicas → Chaves e modelos*). Na APK os pedidos saem pelo Android, sem os bloqueios de CORS do browser. |
@@ -61,6 +62,7 @@ Atenção: mudar de chave obriga a desinstalar a versão anterior. Antes disso, 
 
 ```
 web/oficina.html                 página original (a que se atualiza)
+app/src/main/assets/www/libs/alphatab/   leitor de tablaturas alphaTab 1.8.4 (MPL-2.0), fonte Bravura (OFL) e soundfont Sonivox
 tools/prepare_web.py             gera app/src/main/assets/www/index.html
 app/src/main/assets/www/         página pronta + fonts.css, fonts/, libs/, android-bridge.js
 app/src/main/java/.../MainActivity.java   WebView, transferências, impressão, seletor de ficheiros
