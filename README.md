@@ -39,7 +39,7 @@ O código da app não é alterado. Cada APK nova instala por cima da anterior e 
 | Restaurar cópia | Abre o seletor de ficheiros do telemóvel. |
 | Sites de cifras e ligações externas | Abrem no browser do telemóvel. |
 | Sincronização dos favoritos com a conta | Não existe: tudo fica guardado no telemóvel. Para passar dados entre dispositivos, usa *Guardar cópia* e *Restaurar*. |
-| "Perguntar ao Claude" na procura de músicas | Não está disponível. Os sites, a cifra colada e a biblioteca funcionam. |
+| "Perguntar à IA" na procura de músicas | O Claude não está disponível na APK. Usa Qwen, DeepSeek ou Kimi com a tua chave de API (em *Procurar músicas → Chaves e modelos*). Na APK os pedidos saem pelo Android, sem os bloqueios de CORS do browser. |
 
 ## Assinatura
 

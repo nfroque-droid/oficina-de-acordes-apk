@@ -37,6 +37,34 @@
       });
     }
   };
+  // Pedidos às IAs (Qwen, DeepSeek, Kimi) pelo Android: sem as restrições de CORS do browser.
+  var pend = {}, seq = 0;
+  function fromB64(b64) {
+    var bin = atob(b64 || ''), u = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(u);
+  }
+  window.__oficinaNetDone = function (id, status, b64) {
+    var p = pend[id]; if (!p) return; delete pend[id];
+    if (status < 0) p.rej(new TypeError('network'));
+    else p.res({ status: status, text: fromB64(b64) });
+  };
+  if (A.httpPost) window.OficinaNet = {
+    post: function (url, headers, body, signal) {
+      return new Promise(function (resolve, reject) {
+        var id = 'r' + (++seq);
+        var abort = function () {
+          if (!pend[id]) return; delete pend[id];
+          try { A.httpCancel(id); } catch (e) {}
+          var e = new Error('cancelled'); e.name = 'AbortError'; reject(e);
+        };
+        if (signal && signal.aborted) { var e0 = new Error('cancelled'); e0.name = 'AbortError'; reject(e0); return; }
+        pend[id] = { res: resolve, rej: reject };
+        if (signal) signal.addEventListener('abort', abort);
+        A.httpPost(id, String(url), JSON.stringify(headers || {}), String(body || ''));
+      });
+    }
+  };
   window.claude = window.claude || {};
   window.claude.use = function (cap) { return Promise.resolve(cap === 'downloads' ? downloads : null); };
 })();

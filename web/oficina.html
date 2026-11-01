@@ -811,6 +811,22 @@ body.noscroll{overflow:hidden}
 [data-skin="vidro"] .fpcell{border-radius:8px;background:rgba(15,23,42,.8);border-color:rgba(148,163,184,.18)}
 [data-skin="vidro"] .fpcell.on{color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.4)}
 [data-skin="vidro"] .fpgrid .now{box-shadow:0 0 0 2px #10B981,0 0 12px rgba(16,185,129,.5)}
+/* ---- Outras IAs ---- */
+.aipick{max-width:560px}
+.aiconf{border:1px solid var(--line);border-radius:8px;padding:8px 12px}
+.aiconf summary{cursor:pointer;font-weight:600;font-size:14px;padding:4px 0}
+.aiconf summary small{font-weight:400;color:var(--muted);margin-left:6px}
+.aiconf[open]{display:grid;gap:10px}
+#fd-aikeys{display:grid;gap:10px}
+.aiprov{border:1px solid var(--line);border-radius:8px;margin:0;padding:8px 10px 10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;min-width:0}
+.aiprov legend{font-family:var(--f-display);font-weight:700;font-size:15px;padding:0 4px}
+.aiprov .wide{grid-column:1 / -1}
+.aiprov input{width:100%;height:38px;padding:0 10px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);font-size:15px;font-family:var(--f-mono)}
+.aiprov .note a{color:var(--accent)}
+@media (max-width:520px){.aiprov{grid-template-columns:minmax(0,1fr)}}
+[data-skin="vidro"] .aiconf,[data-skin="vidro"] .aiprov{border-color:rgba(148,163,184,.18);border-radius:12px}
+[data-skin="vidro"] .aiprov input,[data-skin="vidro"] #fd-q{border-radius:10px;background:rgba(15,23,42,.8);border-color:rgba(148,163,184,.2)}
+[data-skin="forja"] .aiconf,[data-skin="forja"] .aiprov{border-radius:12px}
 /* ---- Fingerpicking ---- */
 .fpgridwrap{overflow-x:auto;min-width:0}
 .fpgrid{display:grid;gap:3px;min-width:min-content;align-items:center}
@@ -1344,7 +1360,7 @@ body.noscroll{overflow:hidden}
   <div class="view train" id="view-find" hidden>
     <div class="trainhead"><h2>Procurar músicas</h2><p class="note">Encontra a música que queres aprender e abre-a no separador Música: folha de acordes, diagramas, caixas para solar, ritmo e batida.</p></div>
     <section class="panel full" aria-labelledby="h-fd-ask">
-      <h3 id="h-fd-ask">Perguntar ao Claude</h3>
+      <h3 id="h-fd-ask">Perguntar à IA</h3>
       <div class="field"><label for="fd-q">Música e artista</label><input type="text" id="fd-q" maxlength="120" placeholder="ex.: Stand by Me, Ben E. King" autocomplete="off"></div>
       <div class="actions">
         <button type="button" class="primary" id="fd-ask">Procurar os acordes</button>
@@ -1352,9 +1368,20 @@ body.noscroll{overflow:hidden}
         <a class="ghost sm" id="fd-ug" target="_blank" rel="noopener noreferrer" href="https://www.ultimate-guitar.com/">Ultimate Guitar ↗</a>
         <a class="ghost sm" id="fd-cc" target="_blank" rel="noopener noreferrer" href="https://www.cifraclub.com.br/">Cifra Club ↗</a>
       </div>
+      <div class="field aipick"><label for="fd-ai">IA a usar</label><select id="fd-ai">
+        <option value="auto">Automático (Claude; se faltar, a 1.ª IA com chave)</option>
+        <option value="claude">Só o Claude</option>
+        <option value="qwen">Qwen (Alibaba)</option>
+        <option value="deepseek">DeepSeek</option>
+        <option value="kimi">Kimi (Moonshot)</option>
+      </select></div>
+      <details class="aiconf" id="fd-aiconf"><summary>Chaves e modelos de Qwen, DeepSeek e Kimi <small id="fd-aisum"></small></summary>
+        <p class="note">Fora do claude.ai (a HTML aberta no PC ou a app Android) o Claude não está disponível. Com a chave de API de uma destas IAs, a procura funciona na mesma. As chaves ficam guardadas só neste dispositivo: não entram nas cópias de segurança nem na sincronização. Cada pesquisa é cobrada na tua conta dessa IA.</p>
+        <div id="fd-aikeys"></div>
+      </details>
       <p class="songmsg ok" id="fd-status" role="status"></p>
       <div id="fd-result"></div>
-      <p class="note">Os acordes vêm do conhecimento do Claude, sem letra. Podem ter erros ou ser uma versão simplificada: confirma de ouvido. Cada pesquisa gasta um pouco da tua utilização do Claude; na primeira vez, a página pede autorização. Os botões dos sites abrem a pesquisa noutra janela.</p>
+      <p class="note">Os acordes vêm do conhecimento da IA, sem letra. Podem ter erros ou ser uma versão simplificada: confirma de ouvido. Com o Claude, cada pesquisa gasta um pouco da tua utilização e, na primeira vez, a página pede autorização. Os botões dos sites abrem a pesquisa noutra janela.</p>
     </section>
     <section class="panel full" aria-labelledby="h-fd-paste">
       <h3 id="h-fd-paste">Colar uma cifra</h3>
@@ -3667,13 +3694,94 @@ const TH = (() => {
     });
     return out.trim();
   }
+  // ---- Outras IAs (Qwen, DeepSeek, Kimi) quando o Claude não está disponível ----
+  // As chaves ficam só neste dispositivo (localStorage 'oa-ai'), fora do estado S: não entram nas cópias nem na sincronização.
+  const AIP = {
+    qwen:{name:'Qwen', url:'https://dashscope-intl.aliyuncs.com/compatible-mode/v1', model:'qwen-plus', keys:'https://modelstudio.console.alibabacloud.com/', hint:'Alibaba Cloud Model Studio. Se a consola te der um endereço próprio (…maas.aliyuncs.com/compatible-mode/v1), cola-o aqui.'},
+    deepseek:{name:'DeepSeek', url:'https://api.deepseek.com', model:'deepseek-flash', keys:'https://platform.deepseek.com/api_keys', hint:'Modelos: deepseek-flash (rápido e barato) ou deepseek-v4-pro.'},
+    kimi:{name:'Kimi', url:'https://api.moonshot.ai/v1', model:'kimi-k3', keys:'https://platform.moonshot.ai/console/api-keys', hint:'Moonshot AI. Para contas da China, o endereço é https://api.moonshot.cn/v1. O kimi-k3 pensa antes de responder: pode demorar mais.'}
+  };
+  const AIK = 'oa-ai';
+  function aiCfg(){
+    let c = {}; try { c = JSON.parse(localStorage.getItem(AIK) || '{}') || {}; } catch (e) {}
+    if (!['auto','claude'].concat(Object.keys(AIP)).includes(c.pick)) c.pick = 'auto';
+    for (const k in AIP) c[k] = Object.assign({key:'', model:AIP[k].model, url:AIP[k].url}, c[k] || {});
+    return c;
+  }
+  function aiSave(c){ try { localStorage.setItem(AIK, JSON.stringify(c)); } catch (e) {} }
+  const aiErr = code => { const e = new Error(code); e.code = code; return e; };
+  // Na APK, o pedido sai pelo Android (sem limites de CORS); no browser, com fetch.
+  async function aiPost(url, headers, body, signal){
+    if (window.OficinaNet) return window.OficinaNet.post(url, headers, body, signal);
+    const r = await fetch(url, {method:'POST', headers, body, signal});
+    return {status:r.status, text:await r.text()};
+  }
+  function aiJson(txt){
+    const s = String(txt || '').replace(/```(?:json)?/gi, ''), a = s.indexOf('{'), b = s.lastIndexOf('}');
+    if (a < 0 || b <= a) throw aiErr('invalid_json');
+    try { return JSON.parse(s.slice(a, b + 1)); } catch (e) { throw aiErr('invalid_json'); }
+  }
+  async function aiAsk(p, prompt, signal){
+    const c = aiCfg()[p], base = String(c.url || AIP[p].url).trim().replace(/\/+$/, '');
+    const url = /\/chat\/completions$/.test(base) ? base : base + '/chat/completions';
+    const body = JSON.stringify({model:c.model || AIP[p].model, stream:false, messages:[
+      {role:'system', content:'Responde só com um objeto JSON válido, sem texto antes nem depois e sem blocos de código.'},
+      {role:'user', content:prompt}]});
+    let r;
+    try { r = await aiPost(url, {'Content-Type':'application/json', 'Authorization':'Bearer ' + c.key}, body, signal); }
+    catch (e) { throw aiErr(e && e.name === 'AbortError' ? 'cancelled' : 'network'); }
+    if (r.status === 401 || r.status === 403) throw aiErr('auth');
+    if (r.status === 402) throw aiErr('billing');
+    if (r.status === 429) throw aiErr('rate_limited');
+    if (r.status === 404) throw aiErr('model');
+    if (r.status >= 400 || r.status < 200){ const e = aiErr('http'); e.status = r.status; throw e; }
+    let j; try { j = JSON.parse(r.text); } catch (e) { throw aiErr('invalid_json'); }
+    const m = j && j.choices && j.choices[0] && j.choices[0].message;
+    return aiJson(m && m.content);
+  }
+  function aiSummary(){
+    const c = aiCfg(), on = Object.keys(AIP).filter(k => c[k].key).map(k => AIP[k].name);
+    $('#fd-aisum').textContent = on.length ? `com chave: ${on.join(', ')}` : 'nenhuma chave';
+  }
+  function renderAi(){
+    const c = aiCfg();
+    $('#fd-ai').value = c.pick;
+    $('#fd-aikeys').innerHTML = Object.entries(AIP).map(([k, p]) => `<fieldset class="aiprov"><legend>${p.name}</legend>
+      <div class="field"><label for="ai-${k}-key">Chave da API</label><input type="password" id="ai-${k}-key" data-p="${k}" data-f="key" autocomplete="off" spellcheck="false" placeholder="sk-…"></div>
+      <div class="field"><label for="ai-${k}-model">Modelo</label><input type="text" id="ai-${k}-model" data-p="${k}" data-f="model" autocomplete="off" spellcheck="false"></div>
+      <div class="field wide"><label for="ai-${k}-url">Endereço da API</label><input type="url" id="ai-${k}-url" data-p="${k}" data-f="url" autocomplete="off" spellcheck="false"></div>
+      <p class="note wide">${esc(p.hint)} <a href="${p.keys}" target="_blank" rel="noopener noreferrer">Criar ou ver a chave ↗</a></p></fieldset>`).join('');
+    for (const k in AIP) ['key','model','url'].forEach(f => { $(`#ai-${k}-${f}`).value = c[k][f]; });
+    aiSummary();
+  }
+  function wireAi(){
+    renderAi();
+    $('#fd-ai').addEventListener('change', e => { const c = aiCfg(); c.pick = e.target.value; aiSave(c); });
+    $('#fd-aikeys').addEventListener('input', e => {
+      const t = e.target, p = t.dataset && t.dataset.p, f = t.dataset && t.dataset.f; if (!p || !f) return;
+      const c = aiCfg(); c[p][f] = t.value.trim(); aiSave(c); aiSummary();
+    });
+    $('#fd-aikeys').addEventListener('change', e => {
+      const t = e.target, p = t.dataset && t.dataset.p, f = t.dataset && t.dataset.f; if (!p || f === 'key' || t.value.trim()) return;
+      const c = aiCfg(); c[p][f] = AIP[p][f]; aiSave(c); t.value = AIP[p][f];
+    });
+  }
   let fdCtl = null, fdLast = null;
   async function askSong(){
     const q = $('#fd-q').value.trim(); if (!q) { $('#fd-status').textContent = 'Escreve o nome da música e, se puderes, o artista.'; return; }
-    let sample = null; try { sample = window.claude && window.claude.use ? await window.claude.use('sample') : null; } catch (e) {}
-    if (!sample){ $('#fd-status').textContent = 'Perguntar ao Claude não está disponível nesta vista. Usa os sites, a cifra colada ou a biblioteca.'; return; }
+    const aic = aiCfg(); let sample = null, prov = null;
+    if (aic.pick === 'auto' || aic.pick === 'claude'){ try { sample = window.claude && window.claude.use ? await window.claude.use('sample') : null; } catch (e) {} }
+    if (!sample && aic.pick !== 'claude') prov = aic.pick === 'auto' ? (Object.keys(AIP).find(k => aic[k].key) || null) : aic.pick;
+    $('#fd-status').className = 'songmsg';
+    if (!sample && !prov){
+      $('#fd-status').textContent = aic.pick === 'claude' ? 'O Claude não está disponível aqui. Escolhe Qwen, DeepSeek ou Kimi em "IA a usar" e põe a chave em baixo.'
+        : 'O Claude não está disponível aqui. Para procurar com Qwen, DeepSeek ou Kimi, põe a chave de uma delas em baixo. Também podes usar os sites, a cifra colada ou a biblioteca.';
+      $('#fd-aiconf').open = true; return;
+    }
+    if (prov && !aic[prov].key){ $('#fd-status').textContent = `Falta a chave de API do ${AIP[prov].name}. Põe-na em baixo.`; $('#fd-aiconf').open = true; return; }
+    const who = sample ? 'Claude' : AIP[prov].name;
     fdCtl = new AbortController(); $('#fd-ask').disabled = true; $('#fd-stop').hidden = false; $('#fd-result').innerHTML = '';
-    $('#fd-status').className = 'songmsg ok'; $('#fd-status').textContent = 'A procurar… pode demorar uns segundos.';
+    $('#fd-status').className = 'songmsg ok'; $('#fd-status').textContent = `A procurar com ${who}… pode demorar uns segundos.`;
     const prompt = `És professor de guitarra. A pessoa quer aprender a tocar: "${q.replace(/"/g, "'")}".
 Responde só com um objeto JSON, sem letra da música (nunca incluas versos da letra), neste formato:
 {"found":true,"title":"","artist":"","key":"Am","tempo":96,"meter":"4/4","capo":0,"strum":"D.DU.UDU","feel":"descrição curta do ritmo e de como tocar, em português de Portugal","sections":[{"name":"Intro","bars":["Am","G","F","E"],"repeat":1}],"confidence":"alta","notes":"avisos curtos em português de Portugal"}
@@ -3686,7 +3794,7 @@ Regras:
 - confidence: "alta", "média" ou "baixa" conforme tens a certeza dos acordes.
 - Se não conheces a música, responde {"found":false,"notes":"explicação curta"}.`;
     try {
-      const r = await sample.json(prompt, {signal:fdCtl.signal});
+      const r = sample ? await sample.json(prompt, {signal:fdCtl.signal}) : await aiAsk(prov, prompt, fdCtl.signal);
       if (!r || r.found === false || !Array.isArray(r.sections)){ $('#fd-status').textContent = (r && r.notes) ? String(r.notes) : 'Não encontrei essa música. Tenta escrever também o artista, ou usa os sites.'; return; }
       const text = sectionsToText(r.sections), chk = TH.parseSong(text, 4);
       if (!chk.chords.length){ $('#fd-status').textContent = 'A resposta não trazia acordes que a app consiga ler. Tenta outra vez.'; return; }
@@ -3694,7 +3802,7 @@ Regras:
       const pat = String(r.strum || '').toUpperCase().replace(/[^DU.X]/g, '');
       $('#fd-status').textContent = '';
       $('#fd-result').innerHTML = `<article class="fdcard"><h4>${esc(r.title || q)}</h4>
-        <div class="fdmeta">${r.artist ? `<span>${esc(r.artist)}</span>` : ''}<span>Tom <b>${esc(r.key || '?')}</b></span><span><b>${esc(r.tempo || '?')}</b> BPM</span><span>Compasso <b>${esc(r.meter || '4/4')}</b></span>${+r.capo ? `<span>Cejilla na casa <b>${+r.capo}</b></span>` : ''}<span>Confiança <b>${esc(r.confidence || '?')}</b></span></div>
+        <div class="fdmeta">${r.artist ? `<span>${esc(r.artist)}</span>` : ''}<span>Tom <b>${esc(r.key || '?')}</b></span><span><b>${esc(r.tempo || '?')}</b> BPM</span><span>Compasso <b>${esc(r.meter || '4/4')}</b></span>${+r.capo ? `<span>Cejilla na casa <b>${+r.capo}</b></span>` : ''}<span>Confiança <b>${esc(r.confidence || '?')}</b></span><span>Fonte <b>${esc(who)}</b></span></div>
         ${pat ? `<div class="pat" aria-label="Batida">${[...pat].map(c => `<span class="${c === '.' ? 'rest' : ''}">${{D:'↓', U:'↑', '.':'·', X:'×'}[c]}</span>`).join('')}</div>` : ''}
         ${r.feel ? `<p class="note">${esc(r.feel)}</p>` : ''}
         <pre class="fdsheet">${esc(text)}</pre>
@@ -3706,7 +3814,14 @@ Regras:
       $('#fd-status').className = 'songmsg';
       $('#fd-status').textContent = c === 'cancelled' ? 'Pesquisa parada.' : c === 'not_granted' ? 'A página não tem autorização para perguntar ao Claude. Usa os sites, a cifra colada ou a biblioteca.'
         : c === 'rate_limited' ? 'Muitos pedidos seguidos; tenta daqui a pouco.' : c === 'invalid_json' ? 'A resposta veio num formato que a app não percebeu. Tenta outra vez.'
-        : c === 'refused' ? 'O Claude não respondeu a este pedido.' : 'Não foi possível procurar agora. Tenta outra vez.';
+        : c === 'refused' ? 'O Claude não respondeu a este pedido.'
+        : c === 'auth' ? `A chave de API do ${who} foi recusada. Confirma-a em "Chaves e modelos".`
+        : c === 'billing' ? `A conta do ${who} não tem saldo. Carrega a conta ou escolhe outra IA.`
+        : c === 'model' ? `O ${who} não encontrou o modelo ou o endereço. Confirma-os em "Chaves e modelos".`
+        : c === 'http' ? `O ${who} respondeu com o erro ${e.status}. Tenta outra vez ou escolhe outra IA.`
+        : c === 'network' ? (window.OficinaNet ? `Não foi possível chegar ao ${who}. Confirma a ligação à internet.`
+            : `O pedido ao ${who} não passou: ou não há internet, ou este browser bloqueia o acesso direto a esta IA. Na app Android funciona sempre; no PC, experimenta outra das IAs.`)
+        : 'Não foi possível procurar agora. Tenta outra vez.';
     } finally { $('#fd-ask').disabled = false; $('#fd-stop').hidden = true; fdCtl = null; }
   }
   // Cifra colada: tira a letra e fica com os acordes, as secções, a cejilla e o tom.
@@ -3753,6 +3868,7 @@ Regras:
   function wireFind(){
     $('#fd-q').addEventListener('input', renderFind);
     $('#fd-q').addEventListener('keydown', e => { if (e.key === 'Enter') askSong(); });
+    wireAi();
     $('#fd-ask').addEventListener('click', askSong);
     $('#fd-stop').addEventListener('click', () => { if (fdCtl) fdCtl.abort(); });
     $('#fd-result').addEventListener('click', e => { if (e.target.closest('#fd-open') && fdLast) loadSongData(fdLast); });

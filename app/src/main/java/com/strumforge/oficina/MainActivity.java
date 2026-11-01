@@ -35,9 +35,21 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.webkit.WebViewAssetLoader;
 
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * A Oficina de Acordes num WebView. A página vem dos assets (app/src/main/assets/www) através de
@@ -56,6 +68,8 @@ public class MainActivity extends Activity {
     private WebViewAssetLoader assets;
     private ValueCallback<Uri[]> fileCallback;
     private WebView printWeb;
+    private final ExecutorService net = Executors.newCachedThreadPool();
+    private final Map<String, HttpURLConnection> calls = new ConcurrentHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -186,6 +200,60 @@ public class MainActivity extends Activity {
             }
         }
 
+        /** Pedido HTTPS para as IAs. A resposta volta por window.__oficinaNetDone(id, estado, corpoEmBase64). */
+        @JavascriptInterface
+        public void httpPost(String id, String url, String headersJson, String body) {
+            net.execute(() -> {
+                int status = -1;
+                String b64 = "";
+                HttpURLConnection c = null;
+                try {
+                    URL u = new URL(url);
+                    if (!"https".equals(u.getProtocol())) throw new IllegalArgumentException("só https");
+                    c = (HttpURLConnection) u.openConnection();
+                    calls.put(id, c);
+                    c.setRequestMethod("POST");
+                    c.setConnectTimeout(20000);
+                    c.setReadTimeout(240000);
+                    c.setDoOutput(true);
+                    JSONObject h = new JSONObject(headersJson);
+                    Iterator<String> keys = h.keys();
+                    while (keys.hasNext()) {
+                        String k = keys.next();
+                        c.setRequestProperty(k, h.getString(k));
+                    }
+                    byte[] out = body.getBytes(StandardCharsets.UTF_8);
+                    c.setFixedLengthStreamingMode(out.length);
+                    try (OutputStream o = c.getOutputStream()) { o.write(out); }
+                    status = c.getResponseCode();
+                    InputStream in = status >= 400 ? c.getErrorStream() : c.getInputStream();
+                    ByteArrayOutputStream buf = new ByteArrayOutputStream();
+                    if (in != null) {
+                        try (InputStream i = in) {
+                            byte[] b = new byte[16384];
+                            int n;
+                            while ((n = i.read(b)) > 0) buf.write(b, 0, n);
+                        }
+                    }
+                    b64 = Base64.encodeToString(buf.toByteArray(), Base64.NO_WRAP);
+                } catch (Exception e) {
+                    status = -1;
+                    b64 = "";
+                } finally {
+                    calls.remove(id);
+                    if (c != null) c.disconnect();
+                }
+                final String js = "window.__oficinaNetDone(" + JSONObject.quote(id) + "," + status + "," + JSONObject.quote(b64) + ")";
+                runOnUiThread(() -> { if (web != null) web.evaluateJavascript(js, null); });
+            });
+        }
+
+        @JavascriptInterface
+        public void httpCancel(String id) {
+            HttpURLConnection c = calls.remove(id);
+            if (c != null) net.execute(c::disconnect);
+        }
+
         @JavascriptInterface
         public boolean printHtml(String html, String title) {
             runOnUiThread(() -> {
@@ -272,6 +340,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        net.shutdownNow();
         if (web != null) {
             web.destroy();
             web = null;
