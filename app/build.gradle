@@ -1,0 +1,58 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Assinatura: se existirem os segredos do GitHub (KEYSTORE_*), usa a tua chave de lançamento.
+// Se não existirem, usa a chave do projeto (keystore/oficina.jks), que é sempre a mesma:
+// assim cada APK nova instala por cima da anterior sem perder os favoritos.
+def envKeystore = System.getenv('KEYSTORE_FILE')
+def useEnvKey = envKeystore != null && !envKeystore.isEmpty() && file(envKeystore).exists()
+
+android {
+    namespace 'com.strumforge.oficina'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'com.strumforge.oficina'
+        minSdk 26
+        targetSdk 35
+        versionCode Integer.parseInt(System.getenv('GITHUB_RUN_NUMBER') ?: '1')
+        versionName "1.0.${System.getenv('GITHUB_RUN_NUMBER') ?: '0'}"
+    }
+
+    signingConfigs {
+        oficina {
+            if (useEnvKey) {
+                storeFile file(envKeystore)
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            } else {
+                storeFile rootProject.file('keystore/oficina.jks')
+                storePassword 'oficina-acordes'
+                keyAlias 'oficina'
+                keyPassword 'oficina-acordes'
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.oficina
+        }
+        debug {
+            signingConfig signingConfigs.oficina
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.12.1'
+    implementation 'androidx.core:core:1.13.1'
+}

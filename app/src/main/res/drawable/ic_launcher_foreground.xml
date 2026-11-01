@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Palheta com um pequeno diagrama de acorde (3 cordas, 2 trastes e três notas). Área segura: 66dp ao centro. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#3B82F6"
+        android:pathData="M54,28C68,28 78,33 78,42C78,56 64,72 57,79C55.3,80.8 52.7,80.8 51,79C44,72 30,56 30,42C30,33 40,28 54,28Z" />
+    <path android:fillColor="#00000000" android:strokeColor="#FFFFFF" android:strokeWidth="1.6"
+        android:pathData="M43,40L65,40M43,49L65,49M43,58L65,58M45,40L45,66M54,40L54,70M63,40L63,66" />
+    <path android:fillColor="#FFFFFF" android:pathData="M43,36.5h22v3.5h-22z" />
+    <path android:fillColor="#EF4444" android:pathData="M45,44.5m-3.6,0a3.6,3.6 0,1 1,7.2 0a3.6,3.6 0,1 1,-7.2 0" />
+    <path android:fillColor="#10B981" android:pathData="M54,53.5m-3.6,0a3.6,3.6 0,1 1,7.2 0a3.6,3.6 0,1 1,-7.2 0" />
+    <path android:fillColor="#F59E0B" android:pathData="M63,44.5m-3.6,0a3.6,3.6 0,1 1,7.2 0a3.6,3.6 0,1 1,-7.2 0" />
+</vector>
